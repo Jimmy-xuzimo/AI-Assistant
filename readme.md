@@ -128,7 +128,7 @@ ai-assistant-interface/
 
 ```javascript
 // 配置
-const API_KEY = 'sk-82438a5eb8c1427690dd94e75f489acc';
+const API_KEY = 'YOUR_API_KEY_HERE';
 const API_URL = 'https://api.deepseek.com/chat/completions';
 ```
 
@@ -214,8 +214,8 @@ const API_URL = 'https://api.deepseek.com/chat/completions';
 
 如有问题或建议，请通过以下方式联系：
 
-- 提交 [Issue](https://github.com/yourusername/ai-assistant-interface/issues)
-- 发送邮件到：your-email@example.com
+- 提交 [Issue](https://github.com/Jimmy-xuzimo/AI-Assistant/issues)
+- 发送邮件到：xuzimojimmy@163.com
 
 ## 🙏 致谢
 
