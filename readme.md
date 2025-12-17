@@ -46,13 +46,6 @@
    - 打开 `index.html` 文件
    - 找到以下代码行：
      ```javascript
-     // 配置
-     const API_KEY = 'sk-82438a5eb8c1427690dd94e75f489acc';
-     const API_URL = 'https://api.deepseek.com/chat/completions';
-     ```
-   - 将 `API_KEY` 的值替换为您的DeepSeek API密钥
-   - **注意**：如果使用 `index(无秘钥).html` 文件，找到以下代码行：
-     ```javascript
      // 配置 - 请在此处添加您的API密钥
      const API_KEY = 'YOUR_API_KEY_HERE'; // 替换为您的DeepSeek API密钥
      const API_URL = 'https://api.deepseek.com/chat/completions';
