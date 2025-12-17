@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IOS 26 Aesthetic AI</title>
+    <!-- 引入 Markdown 解析库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 引入 Noto Serif SC 字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* -----------------------------------------------------------
+               颜色变量 (完全保持不变)
+               ----------------------------------------------------------- */
+            /* 浅色模式 - 基于图片配色 */
+            --bg-light: linear-gradient(135deg, #F3F0F8 0%, #E3E6FF 50%, #FDFBFD 100%);
+            --glass-light: rgba(255, 255, 255, 0.45);
+            --glass-border-light: rgba(255, 255, 255, 0.6);
+            --text-light: #4A4A6A;
+            --accent-light: #8A6FE6;
+            --msg-user-light: #FFFFFF;
+            --msg-ai-light: rgba(255, 255, 255, 0.3);
+            --shadow-light: 0 8px 32px 0 rgba(100, 100, 140, 0.1);
+
+            /* 深色模式 */
+            --bg-dark: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F0F1A 100%);
+            --glass-dark: rgba(20, 20, 30, 0.55);
+            --glass-border-dark: rgba(255, 255, 255, 0.08);
+            --text-dark: #E0E0E0;
+            --accent-dark: #A78BFA;
+            --msg-user-dark: #2D2D44;
+            --msg-ai-dark: rgba(255, 255, 255, 0.05);
+            --shadow-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+            /* 字体标题颜色配置 */
+            --heading-color-light: #6366f1;
+            --heading-color-dark: #818cf8;
+            --light-text-light: #6b7280;
+            --light-text-dark: #94a3b8;
+
+            /* 默认变量指向浅色 */
+            --bg: var(--bg-light);
+            --glass: var(--glass-light);
+            --border: var(--glass-border-light);
+            --text: var(--text-light);
+            --accent: var(--accent-light);
+            --msg-user: var(--msg-user-light);
+            --msg-ai: var(--msg-ai-light);
+            --shadow: var(--shadow-light);
+            --heading-color: var(--heading-color-light);
+            --light-text: var(--light-text-light);
+
+            /* IOS R角 */
+            --r-corner: 28px;
+            --r-button: 18px;
+            
+            /* 字体修改：Noto Serif SC */
+            --font-main: 'Noto Serif SC', serif;
+            
+            /* 动画曲线：IOS Spring & Fluid */
+            /* 修改：调整曲线更平滑，配合更长时间的过渡 */
+            --ease-ios: cubic-bezier(0.25, 1, 0.5, 1);
+            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* 深色模式类 */
+        body.dark-mode {
+            --bg: var(--bg-dark);
+            --glass: var(--glass-dark);
+            --border: var(--glass-border-dark);
+            --text: var(--text-dark);
+            --accent: var(--accent-dark);
+            --msg-user: var(--msg-user-dark);
+            --msg-ai: var(--msg-ai-dark);
+            --shadow: var(--shadow-dark);
+            --heading-color: var(--heading-color-dark);
+            --light-text: var(--light-text-dark);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            /* 优化：减少不必要的过渡属性，缩短过渡时间，提高性能 */
+            transition: transform 0.3s var(--ease-ios),
+                        opacity 0.3s var(--ease-ios);
+        }
+
+        /* 仅对主题相关元素应用颜色过渡 */
+        body,
+        .message,
+        .input-box,
+        .send-btn,
+        .sidebar,
+        .new-chat-btn,
+        .history-item,
+        .theme-toggle-wrapper,
+        .theme-svg {
+            transition: background-color 0.5s var(--ease-ios),
+                        color 0.5s var(--ease-ios),
+                        border-color 0.5s var(--ease-ios),
+                        box-shadow 0.5s var(--ease-ios),
+                        fill 0.5s var(--ease-ios),
+                        transform 0.3s var(--ease-ios),
+                        opacity 0.3s var(--ease-ios);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            position: relative;
+        }
+
+        /* 背景装饰元素 */
+        .background-decor {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .decor-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: float 20s ease-in-out infinite;
+            opacity: 0.4;
+            /* 硬件加速优化 */
+            transform: translateZ(0);
+            will-change: transform, opacity;
+        }
+
+        .decor-circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--accent), transparent);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .decor-circle:nth-child(2) {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(167, 139, 250, 0.8), transparent);
+            bottom: -120px;
+            left: -120px;
+            animation-delay: -8s;
+        }
+
+        .decor-circle:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(196, 181, 253, 0.6), transparent);
+            top: 40%;
+            left: 10%;
+            animation-delay: -12s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate3d(0, 0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate3d(30px, -30px, 0) rotate(120deg);
+            }
+            66% {
+                transform: translate3d(-20px, 20px, 0) rotate(240deg);
+            }
+        }
+
+        /* 深色模式下调整装饰元素 */
+        .dark-mode .decor-circle {
+            opacity: 0.25;
+        }
+
+        /* 布局容器 */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(0px);
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--glass), rgba(255, 255, 255, 0.3));
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow), 0 0 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.6s var(--ease-ios);
+            transform-origin: left center;
+        }
+
+        /* 侧边栏悬停效果 */
+        .sidebar:hover {
+            box-shadow: var(--shadow), 0 0 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 移动端侧边栏动画优化 */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                height: 100vh;
+                width: 85%; /* 优化移动端显示比例 */
+                max-width: 320px;
+                transform: translateX(-100%) scale(0.95);
+                background: var(--bg); 
+                transition: transform 0.6s var(--ease-ios), opacity 0.6s var(--ease-ios);
+                font-size: 14px;
+                opacity: 0;
+                box-shadow: var(--shadow), 0 0 50px rgba(0, 0, 0, 0.2);
+                border-radius: 0 20px 20px 0;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+            
+            /* 侧边栏打开时的背景遮罩 */
+            .sidebar-backdrop {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(3px);
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.4s ease, visibility 0.4s ease;
+                z-index: 99;
+                cursor: pointer;
+            }
+            
+            .sidebar.open ~ .sidebar-backdrop {
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            /* 优化移动端历史记录项显示 */
+            .history-item {
+                font-size: 13px;
+                padding: 10px 12px;
+                margin-right: 15px;
+            }
+            
+            /* 移动端删除按钮优化 */
+            .delete-btn {
+                width: 18px;
+                height: 18px;
+                font-size: 14px;
+            }
+        }
+
+        .new-chat-btn {
+            background: var(--msg-user);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 15px;
+            border-radius: var(--r-button);
+            font-family: var(--font-main);
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.3s var(--ease-bounce), background-color 0.4s ease;
+        }
+
+        .new-chat-btn:active {
+            transform: scale(0.96);
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .history-list::-webkit-scrollbar { display: none; }
+
+        /* 历史记录项样式修改 - 增强交互效果 */
+        .history-item {
+            padding: 14px 18px;
+            margin-bottom: 8px;
+            border-radius: var(--r-button);
+            cursor: pointer;
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* 确保文字过长省略 */
+            font-size: 14px;
+            position: relative;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.05));
+            border: 1px solid transparent;
+            transition: all 0.5s var(--ease-ios);
+            margin-right: 20px; /* 留出安全距离 */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* 历史记录项悬停效果 */
+        .history-item:hover {
+            background: linear-gradient(135deg, rgba(138, 111, 230, 0.1), rgba(255, 255, 255, 0.15));
+            opacity: 1;
+            font-weight: 700;
+            transform: translateX(8px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 4px 15px rgba(138, 111, 230, 0.2);
+        }
+        
+        /* 历史记录项激活状态 */
+        .history-item.active {
+            background: linear-gradient(135deg, var(--accent), rgba(138, 111, 230, 0.2));
+            opacity: 1;
+            font-weight: 700;
+            transform: translateX(8px);
+            border-color: var(--accent);
+            box-shadow: 0 6px 20px rgba(138, 111, 230, 0.3);
+            color: white;
+        }
+        
+        /* 删除按钮样式 - 增强交互 */
+        .delete-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%) scale(1);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 1px solid rgba(255, 68, 68, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: all 0.3s var(--ease-ios);
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(255, 68, 68, 0.2);
+        }
+        
+        .history-item:hover .delete-btn {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .delete-btn:hover {
+            background: rgba(255, 68, 68, 0.8);
+            transform: translateY(-50%) scale(1.2);
+            box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+            color: white;
+            opacity: 1;
+        }
+        
+        .delete-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        /* 移动端删除按钮优化 - 始终可见 */
+        @media (max-width: 768px) {
+            .delete-btn {
+                opacity: 0.8;
+                transform: translateY(-50%) scale(1);
+            }
+        }
+        
+        /* 历史记录项进入动画 */
+        @keyframes historyItemSlideIn {
+            0% {
+                opacity: 0;
+                transform: translate3d(-20px, 0, 0) scale(0.9);
+            }
+            100% {
+                opacity: 0.7;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+        }
+        
+        .history-item {
+            animation: historyItemSlideIn 0.6s var(--ease-ios);
+            /* 硬件加速优化 */
+            transform: translateZ(0);
+            will-change: transform, opacity;
+        }
+        
+        /* 历史记录项删除动画 */
+        @keyframes historyItemSlideOut {
+            0% {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate3d(100px, 0, 0) scale(0.8);
+            }
+        }
+        
+        .history-item.deleting {
+            animation: historyItemSlideOut 0.5s var(--ease-ios) forwards;
+        }
+
+        /* 主聊天区 */
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 顶部导航 */
+        .top-bar {
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* 模型切换按钮 - 优化设计 */
+        .model-toggle {
+            display: flex;
+            background: var(--glass);
+            padding: 4px;
+            border-radius: var(--r-button);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .model-btn {
+            padding: 8px 24px;
+            border-radius: calc(var(--r-button) - 4px);
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-family: var(--font-main);
+            cursor: pointer;
+            font-size: 15px;
+            opacity: 0.6;
+            transition: all 0.3s var(--ease-ios);
+            transform: translateZ(0);
+            will-change: transform, opacity, background-color;
+        }
+
+        .model-btn.active {
+            background: var(--msg-user);
+            font-weight: bold;
+            opacity: 1;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transform: scale(1);
+        }
+
+        /* 主题切换按钮 - 水平滑动设计 */
+        .theme-toggle-wrapper {
+            position: relative;
+            width: 80px;
+            height: 40px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s var(--ease-ios);
+            overflow: hidden;
+        }
+
+        .theme-toggle-slider {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            cursor: pointer;
+        }
+
+        .theme-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: opacity 0.3s var(--ease-ios), transform 0.3s var(--ease-ios);
+        }
+
+        .sun-icon {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .moon-icon {
+            opacity: 0.6;
+            transform: translateX(0);
+        }
+
+        .dark-mode .sun-icon {
+            opacity: 0.6;
+        }
+
+        .dark-mode .moon-icon {
+            opacity: 1;
+        }
+
+        .theme-toggle-thumb {
+            position: absolute;
+            left: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: var(--msg-user);
+            border-radius: 50%;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s var(--ease-ios), background-color 0.3s var(--ease-ios);
+            z-index: 1;
+        }
+
+        .dark-mode .theme-toggle-thumb {
+            transform: translateY(-50%) translateX(40px);
+        }
+
+        .theme-toggle-wrapper:hover {
+            box-shadow: var(--shadow), 0 0 15px rgba(138, 111, 230, 0.2);
+        }
+
+        .theme-toggle-slider:active .theme-toggle-thumb {
+            transform: translateY(-50%) scale(0.9);
+        }
+
+        .dark-mode .theme-toggle-slider:active .theme-toggle-thumb {
+            transform: translateY(-50%) translateX(40px) scale(0.9);
+        }
+
+        /* 主题切换时的全局过渡效果增强 */
+        * {
+            transition: background-color 1.2s var(--ease-ios), 
+                        color 1.2s var(--ease-ios), 
+                        border-color 1.2s var(--ease-ios), 
+                        box-shadow 1.2s var(--ease-ios),
+                        transform 0.5s var(--ease-ios),
+                        fill 1.2s var(--ease-ios),
+                        opacity 1.2s var(--ease-ios);
+        }
+
+        /* 聊天内容区 - 优化布局，增加内容显示区域 */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 5%;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            scroll-behavior: smooth;
+        }
+
+        /* 欢迎界面 */
+        .welcome-screen {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 0 20px;
+            animation: welcomeSlideIn 1.2s var(--ease-ios);
+            z-index: 5;
+        }
+
+        @keyframes welcomeSlideIn {
+            0% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
+            60% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.02); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        .welcome-icon {
+            font-size: 60px;
+            margin-bottom: 28px;
+            display: inline-block;
+            background: linear-gradient(135deg, #8A6FE6, #A78BFA, #C4B5FD);
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            border-radius: 30px;
+            color: white;
+            box-shadow: 0 15px 30px rgba(138, 111, 230, 0.3);
+            animation: welcomeIconBounce 1.2s var(--ease-bounce) 0.3s backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes welcomeIconBounce {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(0deg); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .welcome-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            animation: welcomeIconShine 3s ease-in-out infinite;
+        }
+
+        @keyframes welcomeIconShine {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .welcome-title {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 800;
+            font-size: 2.2rem;
+            color: var(--heading-color);
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+            letter-spacing: 0.08em;
+            animation: welcomeTitleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes welcomeTitleGlow {
+            from { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15); }
+            to { text-shadow: 2px 2px 10px var(--heading-color), 0 0 20px var(--heading-color); }
+        }
+
+        @media (min-width: 768px) {
+            .welcome-title {
+                font-size: 3rem;
+            }
+        }
+
+        /* 欢迎副标题 */
+        .welcome-sub {
+            display: block;
+            font-size: 1.1rem;
+            color: var(--light-text);
+            margin-top: 1rem;
+            opacity: 0.8;
+            animation: welcomeSubFadeIn 1.5s ease-in-out 0.8s backwards;
+        }
+
+        @keyframes welcomeSubFadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 0.8; transform: translateY(0); }
+        }
+
+        /* 欢迎提示文字 */
+        .welcome-tips {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            animation: welcomeTipsFadeIn 1.8s ease-in-out 1s backwards;
+        }
+
+        @keyframes welcomeTipsFadeIn {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 0.7; transform: translateY(0); }
+        }
+
+        .welcome-tip {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--light-text);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 脉冲效果 */
+        @keyframes welcomePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* 消息气泡 - 优化宽度，增加内容显示区域 */
+        .message {
+            max-width: 85%;
+            padding: 18px 26px;
+            border-radius: var(--r-corner);
+            line-height: 1.8;
+            font-size: 16px;
+            position: relative;
+            animation: messageSlideIn 0.8s var(--ease-ios);
+            transform-origin: bottom center;
+            word-wrap: break-word;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            /* 硬件加速优化 */
+            transform: translateZ(0);
+            will-change: transform, opacity, box-shadow;
+        }
+
+        @keyframes messageSlideIn {
+            0% { opacity: 0; transform: translate3d(0, 40px, 0) scale(0.9); }
+            50% { opacity: 0.8; transform: translate3d(0, 10px, 0) scale(1.02); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+        }
+
+        .message:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--msg-user) 0%, rgba(255, 255, 255, 0.15) 100%);
+            border-bottom-right-radius: 8px;
+            box-shadow: 0 6px 16px rgba(138, 111, 230, 0.2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            position: relative;
+            backdrop-filter: blur(15px);
+        }
+
+        .message.user::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 90% 10%, rgba(138, 111, 230, 0.15) 0%, transparent 70%);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: linear-gradient(135deg, var(--msg-ai) 0%, rgba(255, 255, 255, 0.15) 100%);
+            border-bottom-left-radius: 8px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(15px);
+            position: relative;
+        }
+
+        .message.ai::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), transparent);
+            border-radius: 50%;
+            opacity: 0.1;
+            transform: translate(-50%, -50%);
+            animation: aiMessagePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes aiMessagePulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.1; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.2; }
+        }
+        
+        .message pre {
+            background: rgba(0,0,0,0.08);
+            padding: 16px;
+            border-radius: 16px;
+            overflow-x: auto;
+            border: 1px solid rgba(0,0,0,0.1);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .dark-mode .message pre {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        /* 代码块高亮 */
+        .message code {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+        }
+        .dark-mode .message code {
+            background: rgba(0,0,0,0.3);
+        }
+
+        /* 加载动画样式 */
+        .message .loading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* 更丰富的加载动画 - 三个跳动的点 */
+        .loading-dots {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: loadingDotBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes loadingDotBounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* 旋转加载动画 */
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(138, 111, 230, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: loadingSpin 1s linear infinite;
+            position: relative;
+        }
+
+        .loading-spinner::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(138, 111, 230, 0.3);
+            border-radius: 50%;
+            border-bottom-color: var(--accent);
+            animation: loadingSpinReverse 0.8s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes loadingSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes loadingSpinReverse {
+            to { transform: translate(-50%, -50%) rotate(-360deg); }
+        }
+
+        /* 加载文字动画 */
+        .loading-text {
+            background: linear-gradient(90deg, var(--accent), var(--heading-color), var(--accent));
+            background-size: 200% auto;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            animation: loadingTextGradient 2s ease-in-out infinite;
+        }
+
+        @keyframes loadingTextGradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* 输入区域 - 优化内边距，与聊天区域保持一致 */
+        .input-container {
+            padding: 20px 5%;
+            padding-bottom: 40px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .input-box {
+            background: linear-gradient(135deg, var(--msg-user), rgba(255, 255, 255, 0.9));
+            border-radius: 35px;
+            padding: 10px 10px 10px 26px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow), 0 0 20px rgba(0, 0, 0, 0.05);
+            border: 2px solid transparent;
+            transition: all 0.5s var(--ease-ios);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .input-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .input-box:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow), 0 0 30px rgba(138, 111, 230, 0.15);
+        }
+
+        .input-box:focus-within {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow), 0 0 40px rgba(138, 111, 230, 0.25);
+            border-color: var(--accent);
+            background: var(--msg-user);
+        }
+
+        .input-box:focus-within::before {
+            opacity: 0.1;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: var(--font-main);
+            font-size: 16px;
+            color: var(--text);
+            outline: none;
+            height: 48px;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--light-text);
+            transition: color 0.3s ease;
+        }
+
+        .input-box:focus-within input[type="text"]::placeholder {
+            color: var(--accent);
+            opacity: 0.8;
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E8E8E8, #F0F0F0);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s var(--ease-bounce);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .send-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: all 0.4s ease;
+        }
+
+        .send-btn:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .send-btn:hover {
+            background: linear-gradient(135deg, var(--accent), rgba(138, 111, 230, 0.9));
+            transform: scale(1.15) rotate(-15deg);
+            box-shadow: 0 8px 20px rgba(138, 111, 230, 0.4);
+        }
+        
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .send-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: #888;
+            transition: all 0.5s ease;
+            z-index: 1;
+        }
+        
+        .send-btn:hover svg {
+            fill: white;
+            transform: scale(1.2) rotate(15deg);
+        }
+        
+        /* 深色模式下的输入框样式优化 */
+        .dark-mode .input-box {
+            background: linear-gradient(135deg, var(--msg-user-dark), rgba(45, 45, 68, 0.9));
+            box-shadow: var(--shadow-dark), 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dark-mode .input-box:hover {
+            box-shadow: var(--shadow-dark), 0 0 30px rgba(167, 139, 250, 0.2);
+        }
+        
+        .dark-mode .input-box:focus-within {
+            box-shadow: var(--shadow-dark), 0 0 40px rgba(167, 139, 250, 0.35);
+        }
+        
+        .dark-mode input[type="text"] {
+            color: var(--text-dark);
+        }
+        
+        .dark-mode input[type="text"]::placeholder {
+            color: var(--light-text-dark);
+        }
+        
+        .dark-mode .input-box:focus-within input[type="text"]::placeholder {
+            color: var(--accent-dark);
+        }
+        
+        .dark-mode .send-btn {
+            background: linear-gradient(135deg, #2D2D44, #3A3A5A);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dark-mode .send-btn svg {
+            fill: var(--light-text-dark);
+        }
+        
+        /* 历史记录项标题样式 */
+        .history-item-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+        
+        /* 输入框获得焦点时的动画效果 */
+        @keyframes inputPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .input-box:focus-within {
+            animation: inputPulse 0.6s ease-in-out;
+        }
+
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 24px;
+            margin-right: 15px;
+            color: var(--text);
+            transition: transform 0.2s;
+        }
+        .menu-toggle:active { transform: scale(0.8); }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .chat-area, .input-container { padding-left: 20px; padding-right: 20px; }
+            .top-bar { padding: 15px 20px; }
+        }
+
+        /* 智能手表适配 */
+        @media (max-width: 320px) {
+            .sidebar { display: none !important; }
+            .menu-toggle { display: none; }
+            .top-bar { padding: 10px; justify-content: center; flex-wrap: wrap; }
+            .theme-toggle-wrapper { position: absolute; top: 10px; right: 50%; transform: translateX(50%); opacity: 0.5; }
+            .model-toggle { transform: scale(0.8); margin-top: 30px; }
+            .chat-area { padding: 40px 15px 60px 15px; text-align: center; }
+            .message { max-width: 100%; margin-bottom: 10px; font-size: 14px; text-align: left; padding: 10px 15px; }
+            .input-container { padding: 10px; bottom: 15px; }
+            .input-box { padding: 4px 4px 4px 15px; }
+            .welcome-icon { width: 50px; height: 50px; line-height: 50px; font-size: 24px; }
+            .welcome-title { font-size: 18px; }
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <!-- 背景装饰元素 -->
+    <div class="background-decor">
+        <div class="decor-circle"></div>
+        <div class="decor-circle"></div>
+        <div class="decor-circle"></div>
+        
+    </div>
+    
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar" id="sidebar">
+            <button class="new-chat-btn" onclick="startNewChat()">
+                <span>+</span> 新的对话
+            </button>
+            <div class="history-list" id="history-list">
+                <!-- 历史记录 JS 生成 -->
+            </div>
+        </div>
+        
+        <!-- 侧边栏背景遮罩 -->
+        <div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+        <!-- 主界面 -->
+        <main class="main-chat">
+            <div class="top-bar">
+                <div style="display: flex; align-items: center;">
+                    <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+                    <div class="model-toggle">
+                        <button class="model-btn active" id="btn-chat" onclick="switchModel('chat')">Chat</button>
+                        <button class="model-btn" id="btn-reasoner" onclick="switchModel('reasoner')">Reasoner</button>
+                    </div>
+                </div>
+                
+                <!-- 主题切换按钮 - 水平滑动设计 -->
+                <div class="theme-toggle-wrapper" id="theme-btn">
+                    <div class="theme-toggle-slider" onclick="toggleTheme()">
+                        <div class="theme-icon sun-icon">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <circle cx="12" cy="12" r="5" fill="var(--accent)"/>
+                                <line x1="12" y1="1" x2="12" y2="3" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="12" y1="21" x2="12" y2="23" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="1" y1="12" x2="3" y2="12" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="21" y1="12" x2="23" y2="12" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="theme-icon moon-icon">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="var(--accent)"/>
+                            </svg>
+                        </div>
+                        <div class="theme-toggle-thumb"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-area" id="chat-container">
+                <div class="welcome-screen" id="welcome-screen">
+                    <div class="welcome-icon">💬</div>
+                    <div class="welcome-title">AI助手</div>
+                    <div class="welcome-sub">智能对话，助力思考</div>
+                    <div class="welcome-tips">
+                        <div class="welcome-tip">💡 支持多轮对话</div>
+                        <div class="welcome-tip">📚 知识丰富</div>
+                        <div class="welcome-tip">🚀 响应迅速</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-box">
+                    <input type="text" id="user-input" placeholder="Message DeepSeek Chat..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()">
+                        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 配置 - 请在此处添加您的API密钥
+        const API_KEY = 'YOUR_API_KEY_HERE'; // 替换为您的DeepSeek API密钥
+        const API_URL = 'https://api.deepseek.com/chat/completions';
+        
+        // DOM 元素缓存
+        const dom = {
+            chatContainer: document.getElementById('chat-container'),
+            userInput: document.getElementById('user-input'),
+            historyList: document.getElementById('history-list'),
+            sidebar: document.getElementById('sidebar'),
+            welcomeScreen: document.getElementById('welcome-screen'),
+            themeIconSvg: document.getElementById('theme-icon-svg'),
+            btnChat: document.getElementById('btn-chat'),
+            btnReasoner: document.getElementById('btn-reasoner')
+        };
+        
+        // 状态
+        let currentModel = 'deepseek-chat'; 
+        let messages = [];
+        let chats = JSON.parse(localStorage.getItem('chats') || '[]');
+        let currentChatId = null;
+
+        window.onload = () => {
+            renderHistory();
+            startNewChat();
+        };
+        
+        function switchModel(mode) {
+            const btnChat = document.getElementById('btn-chat');
+            const btnReasoner = document.getElementById('btn-reasoner');
+            const input = document.getElementById('user-input');
+
+            if (mode === 'chat') {
+                currentModel = 'deepseek-chat';
+                btnChat.classList.add('active');
+                btnReasoner.classList.remove('active');
+                input.placeholder = "Message DeepSeek Chat...";
+            } else {
+                currentModel = 'deepseek-reasoner';
+                btnChat.classList.remove('active');
+                btnReasoner.classList.add('active');
+                input.placeholder = "Message DeepSeek Reasoner...";
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            // CSS会自动处理图标的切换效果
+        }
+
+        async function sendMessage() {
+            const text = dom.userInput.value.trim();
+            if (!text) return;
+
+            if(dom.welcomeScreen) {
+                dom.welcomeScreen.style.opacity = '0';
+                setTimeout(() => {
+                    dom.welcomeScreen.style.display = 'none';
+                }, 300);
+            }
+
+            addMessageToUI('user', text);
+            messages.push({ role: 'user', content: text });
+            dom.userInput.value = '';
+
+            if (messages.length === 1) {
+                updateCurrentChatTitle(text);
+            }
+
+            const aiMsgId = 'ai-' + Date.now();
+            addMessageToUI('ai', '<span class="loading"><span class="loading-text">正在思考</span><div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div></span>', aiMsgId);
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: currentModel,
+                        messages: messages,
+                        stream: false 
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.choices && data.choices.length > 0) {
+                    const aiContent = data.choices[0].message.content;
+                    updateMessageUI(aiMsgId, aiContent);
+                    messages.push({ role: 'assistant', content: aiContent });
+                    saveChat();
+                } else {
+                    updateMessageUI(aiMsgId, 'Error: No response from API.');
+                }
+
+            } catch (error) {
+                console.error(error);
+                updateMessageUI(aiMsgId, 'Error connecting to DeepSeek API.');
+            }
+        }
+
+        function addMessageToUI(role, content, id = null) {
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            if (id) div.id = id;
+            
+            if (role === 'user') {
+                div.textContent = content;
+            } else {
+                div.innerHTML = content;
+            }
+            
+            dom.chatContainer.appendChild(div);
+            scrollToBottom();
+        }
+
+        function updateMessageUI(id, markdownContent) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.innerHTML = marked.parse(markdownContent);
+                scrollToBottom();
+            }
+        }
+
+        function scrollToBottom() {
+            dom.chatContainer.scrollTop = dom.chatContainer.scrollHeight;
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function startNewChat() {
+            currentChatId = Date.now();
+            messages = [];
+            dom.chatContainer.innerHTML = `
+                <div class="welcome-screen" id="welcome-screen">
+                    <div class="welcome-icon">💬</div>
+                    <div class="welcome-title">AI助手</div>
+                    <div class="welcome-sub">智能对话，助力思考</div>
+                    <div class="welcome-tips">
+                        <div class="welcome-tip">💡 支持多轮对话</div>
+                        <div class="welcome-tip">📚 知识丰富</div>
+                        <div class="welcome-tip">🚀 响应迅速</div>
+                    </div>
+                </div>
+            `;
+            // 更新 DOM 缓存中的 welcomeScreen 引用
+            dom.welcomeScreen = document.getElementById('welcome-screen');
+            dom.sidebar.classList.remove('open');
+            renderHistory();
+        }
+
+        function updateCurrentChatTitle(firstMessage) {
+            const title = firstMessage.substring(0, 20) + (firstMessage.length > 20 ? '...' : '');
+            const chatIndex = chats.findIndex(c => c.id === currentChatId);
+            
+            if (chatIndex > -1) {
+                chats[chatIndex].title = title;
+                chats[chatIndex].messages = messages;
+            } else {
+                chats.unshift({
+                    id: currentChatId,
+                    title: title,
+                    messages: messages,
+                    timestamp: Date.now()
+                });
+            }
+            localStorage.setItem('chats', JSON.stringify(chats));
+            renderHistory();
+        }
+
+        function saveChat() {
+            const chatIndex = chats.findIndex(c => c.id === currentChatId);
+            if (chatIndex > -1) {
+                chats[chatIndex].messages = messages;
+                localStorage.setItem('chats', JSON.stringify(chats));
+            }
+        }
+
+        function loadChat(id) {
+            const chat = chats.find(c => c.id === id);
+            if (!chat) return;
+
+            currentChatId = chat.id;
+            messages = chat.messages || [];
+            
+            const container = document.getElementById('chat-container');
+            container.innerHTML = ''; 
+            
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                let roleClass = msg.role;
+                if (roleClass === 'assistant') roleClass = 'ai';
+                
+                div.className = `message ${roleClass}`;
+                
+                if (msg.role === 'user') {
+                    div.textContent = msg.content;
+                } else {
+                    div.innerHTML = marked.parse(msg.content);
+                }
+                container.appendChild(div);
+            });
+
+            document.getElementById('sidebar').classList.remove('open');
+            scrollToBottom();
+        }
+
+        function renderHistory() {
+            dom.historyList.innerHTML = '';
+            
+            chats.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                if (chat.id === currentChatId) item.classList.add('active');
+                
+                // 创建聊天记录标题元素
+                const title = document.createElement('div');
+                title.className = 'history-item-title';
+                title.textContent = chat.title || 'New Conversation';
+                title.onclick = () => {
+                    loadChat(chat.id);
+                    document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                };
+                
+                // 创建删除按钮
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '×';
+                deleteBtn.title = '删除对话';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation(); // 阻止冒泡，避免触发聊天记录点击
+                    deleteChat(chat.id);
+                };
+                
+                // 将标题和删除按钮添加到聊天记录项
+                item.appendChild(title);
+                item.appendChild(deleteBtn);
+                
+                dom.historyList.appendChild(item);
+            });
+        }
+
+        function deleteChat(chatId) {
+            // 显示确认对话框
+            if (confirm('确定要删除这条对话记录吗？此操作不可恢复。')) {
+                // 查找要删除的聊天记录索引
+                const chatIndex = chats.findIndex(chat => chat.id === chatId);
+                if (chatIndex > -1) {
+                    // 如果删除的是当前活跃的聊天记录，则开始新的聊天
+                    if (chatId === currentChatId) {
+                        startNewChat();
+                    }
+                    
+                    // 从数组中移除聊天记录
+                    chats.splice(chatIndex, 1);
+                    
+                    // 更新localStorage
+                    localStorage.setItem('chats', JSON.stringify(chats));
+                    
+                    // 重新渲染聊天记录列表
+                    renderHistory();
+                }
+            }
+        }
+
+        function toggleSidebar() {
+            dom.sidebar.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
