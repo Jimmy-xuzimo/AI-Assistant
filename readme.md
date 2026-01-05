@@ -1,6 +1,8 @@
 # AI 助手界面
 
 一个现代化、响应式的AI助手网页界面，支持深色/浅色主题切换，流畅的动画效果，以及完整的聊天功能。
+<img width="4400" height="2722" alt="image" src="https://github.com/user-attachments/assets/195c5562-6844-4e5c-9056-0a908f8d63d6" />
+<img width="4400" height="2722" alt="image" src="https://github.com/user-attachments/assets/e2b414fb-acfe-4b11-8efc-eac3b4b929a5" />
 
 ## ✨ 功能特性
 
